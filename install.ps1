@@ -2,7 +2,6 @@ $ErrorActionPreference = "Stop"
 
 $installDir = Join-Path $HOME ".local\bin"
 $scriptName = "sync-claude-to-opencode.ps1"
-$repoRaw = "https://raw.githubusercontent.com/lehdqlsl/opencode-claude-auth-sync/main"
 
 $claudeCreds = Join-Path $HOME ".claude\.credentials.json"
 $opencodeAuth = Join-Path $HOME ".local\share\opencode\auth.json"
@@ -28,7 +27,9 @@ if (-not (Test-Path $opencodeAuth)) {
 
 Write-Output "==> Installing sync script to $installDir\$scriptName..."
 New-Item -ItemType Directory -Force -Path $installDir | Out-Null
-Invoke-WebRequest -Uri "$repoRaw/$scriptName" -OutFile "$installDir\$scriptName"
+$localScript = Join-Path $PSScriptRoot $scriptName
+if (-not (Test-Path $localScript)) { Write-Error "ERROR: $scriptName not found in $PSScriptRoot"; exit 1 }
+Copy-Item -Path $localScript -Destination "$installDir\$scriptName" -Force
 
 Write-Output "==> Running initial sync..."
 # Prefer pwsh (PS 7+) over powershell.exe (5.1) for UTF-8 correctness

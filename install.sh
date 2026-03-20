@@ -3,7 +3,7 @@ set -euo pipefail
 
 INSTALL_DIR="${HOME}/.local/bin"
 SCRIPT_NAME="sync-claude-to-opencode.sh"
-REPO_RAW="https://raw.githubusercontent.com/lehdqlsl/opencode-claude-auth-sync/main"
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 CRON_MARKER="# opencode-claude-auth-sync"
 
 CLAUDE_CREDS="${HOME}/.claude/.credentials.json"
@@ -43,13 +43,10 @@ fi
 echo "==> Installing sync script to ${INSTALL_DIR}/${SCRIPT_NAME}..."
 mkdir -p "$INSTALL_DIR"
 
-if command -v curl >/dev/null 2>&1; then
-  curl -fsSL "${REPO_RAW}/${SCRIPT_NAME}" -o "${INSTALL_DIR}/${SCRIPT_NAME}"
-elif command -v wget >/dev/null 2>&1; then
-  wget -qO "${INSTALL_DIR}/${SCRIPT_NAME}" "${REPO_RAW}/${SCRIPT_NAME}"
-else
-  echo "ERROR: curl or wget is required"; exit 1
+if [[ ! -f "${SCRIPT_DIR}/${SCRIPT_NAME}" ]]; then
+  echo "ERROR: ${SCRIPT_NAME} not found in ${SCRIPT_DIR}"; exit 1
 fi
+cp "${SCRIPT_DIR}/${SCRIPT_NAME}" "${INSTALL_DIR}/${SCRIPT_NAME}"
 
 chmod +x "${INSTALL_DIR}/${SCRIPT_NAME}"
 
